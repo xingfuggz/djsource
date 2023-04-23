@@ -10,7 +10,7 @@ from bayke.models.user import BaykeUser
 
 
 class CheckVerifyCodeMixin:
-    """ 验证码效验 """
+    """ 验证码单独效验 """
     
     def verify(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

@@ -31,4 +31,7 @@ urlpatterns = [
     path("verify/", token.TokenVerifyView.as_view(), name="verify"),
     # 注册接口
     path("register/", generics.BaykeUserRegisterAPIView.as_view(), name="register"),
+    
+    # 商品列表接口
+    path("product/list/", generics.BaykeProductSPUListAPIView.as_view(), name="product-list")
 ]

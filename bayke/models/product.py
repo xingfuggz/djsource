@@ -17,6 +17,14 @@ from . import base
 class BaykeProductCategory(base.CategoryMixin):
     """Model definition for BaykeProductCategory."""
 
+    parent = models.ForeignKey(
+        "self", 
+        on_delete=models.CASCADE, 
+        blank=True, 
+        null=True, 
+        verbose_name=_("父级")
+    )
+    
     # TODO: Define fields here
 
     class Meta:
@@ -70,7 +78,7 @@ class BaykeProductSpecOption(base.BaseModelMixin):
 class BaykeProductSPU(base.GoodsMixin):
     """Model definition for BaykeSpu."""
     
-    cates = models.ManyToManyField(BaykeProductCategory, blank=True, verbose_name=_("商品分类"))
+    cates = models.ManyToManyField(BaykeProductCategory, verbose_name=_("商品分类"))
     
     # TODO: Define fields here
 

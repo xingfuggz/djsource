@@ -125,4 +125,13 @@ class RegisterSerializer(CheckEmailCodeSerializer):
         super().validate(attrs)  # 邮箱验证 
         del attrs["code"]
         return attrs
+
+
+
+class BaykeProductSPUSerializer(serializers.ModelSerializer):
+    """ 商品序列化 """
     
+    class Meta:
+        from bayke.models.product import BaykeProductSPU
+        model = BaykeProductSPU
+        fields = "__all__"
