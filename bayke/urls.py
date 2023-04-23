@@ -19,19 +19,21 @@ app_name = "bayke"
 urlpatterns = [
     # 当前登录用户详情
     path('user/<int:pk>/', generics.BaykeUserRetrieveAPIView.as_view(), name='user-detail'),
-    # 获取邮箱验证码
+    # 获取邮箱验证码 post
     path('obtain/code/', generics.BaykeVerifyCodeObtainAPIView.as_view(), name='obtain-code'),
-    # 效验邮箱验证码
+    # 效验邮箱验证码 post
     path('check/code/', generics.BaykeVerifyCodeCheckAPIView.as_view(), name='check-code'),
-    # 获取token
+    # 获取token post
     path("token/", token.TokenObtainPairView.as_view(), name="token"),
-    # 刷新token 
+    # 刷新token post
     path("refresh/", token.TokenRefreshView.as_view(), name="refresh"),
-    # 验证token     
+    # 验证token post 
     path("verify/", token.TokenVerifyView.as_view(), name="verify"),
-    # 注册接口
+    # 注册接口 post
     path("register/", generics.BaykeUserRegisterAPIView.as_view(), name="register"),
     
-    # 商品列表接口
-    path("product/list/", generics.BaykeProductSPUListAPIView.as_view(), name="product-list")
+    # 商品列表接口 get
+    path("product/list/", generics.BaykeProductSPUListAPIView.as_view(), name="product-list"), 
+    # 商品详情接口 get
+    path("product/<int:pk>/", generics.BaykeProductSPURetrieveAPIView.as_view(), name="product-detail")
 ]

@@ -127,9 +127,19 @@ class RegisterSerializer(CheckEmailCodeSerializer):
         return attrs
 
 
+class BaykeProductBannerSerializer(serializers.ModelSerializer):
+    """ 商品序列化 """
+    
+    class Meta:
+        from bayke.models.product import BaykeProductBanner
+        model = BaykeProductBanner
+        fields = ("id", "img")
+
 
 class BaykeProductSPUSerializer(serializers.ModelSerializer):
     """ 商品序列化 """
+    
+    baykeproductbanner_set = BaykeProductBannerSerializer(many=True)
     
     class Meta:
         from bayke.models.product import BaykeProductSPU

@@ -17,6 +17,7 @@ from rest_framework.generics import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 
 class BaykeUserRetrieveAPIView(RetrieveAPIView):
@@ -69,12 +70,37 @@ class BaykeUserRegisterAPIView(RegisterUserMixin, GenericAPIView):
     
 
 class BaykeProductSPUListAPIView(ListAPIView):
-    """ 商品列表接口 """
+    """ 商品列表接口 
+    搜索模糊匹配： "title", "desc", "keywords", "content"
+    排序：        'baykeproductsku__price', 'baykeproductsku__sales', 'add_date'
+    多分类筛选:    cates=33&cates=34
+    """
+    
+    from django_filters.rest_framework.backends import DjangoFilterBackend
+    from bayke.models.product import BaykeProductSPU
+    from bayke.views.rest_framework.serializers import BaykeProductSPUSerializer
+    from bayke.views.rest_framework.filters import BaykeProductSPUFilter
+    from bayke.pagination import PageNumberPagination
+    
+    serializer_class = BaykeProductSPUSerializer
+    queryset = BaykeProductSPU.objects.all()
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = BaykeProductSPUFilter
+    search_fields = ("title", "desc", "keywords", "content")
+    ordering_fields = ('baykeproductsku__price', 'baykeproductsku__sales', 'add_date',)
+    
+
+from bayke.views.rest_framework.mixins import BaykeProductSPURetrieveMixin
+class BaykeProductSPURetrieveAPIView(BaykeProductSPURetrieveMixin, GenericAPIView):
     
     from bayke.models.product import BaykeProductSPU
     from bayke.views.rest_framework.serializers import BaykeProductSPUSerializer
     serializer_class = BaykeProductSPUSerializer
     queryset = BaykeProductSPU.objects.all()
     
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+    
+    def get_serializer(self, *args, **kwargs):
+        return super().get_serializer(*args, **kwargs)

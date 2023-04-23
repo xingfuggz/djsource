@@ -37,3 +37,23 @@ class RegisterUserMixin(mixins.CreateModelMixin):
         
     def perform_create(self, serializer):
         return super().perform_create(serializer)
+    
+
+class BaykeProductSPURetrieveMixin(mixins.RetrieveModelMixin):
+    
+    pass
+    
+    # def retrieve(self, request, *args, **kwargs):
+    #     response = super().retrieve(request, *args, **kwargs)
+    #     response.data["banners"] = self.get_banners()
+    #     return response
+    
+    # def get_banners(self):
+    #     from bayke.views.rest_framework.serializers import BaykeProductBannerSerializer
+    #     serializer = BaykeProductBannerSerializer(self.get_banner_queryset(), many=True)
+    #     return serializer.data
+    
+    # def get_banner_queryset(self):
+    #     return self.get_object().baykeproductbanner_set.all()
+    
+    
