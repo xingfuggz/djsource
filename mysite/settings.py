@@ -110,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -136,3 +136,6 @@ EMAIL_HOST_USER = "xxx.qq.com"            # 自己的邮箱地址
 EMAIL_HOST_PASSWORD = "xxxxxxx"           # 自己的邮箱密码，或授权码，一般现在的邮箱都需要授权码
 EMAIL_PORT = 465                          # 用于中定义的SMTP服务器的端口
 EMAIL_USE_SSL = True                      # 是否使用隐式的安全连接
+
+# 控制台后端
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

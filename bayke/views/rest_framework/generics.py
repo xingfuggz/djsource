@@ -15,6 +15,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+
+from bayke.models.user import BaykeVerifyCode
 from bayke.views.rest_framework.serializers import (
     UserSerializer, CreateEmailCodeSerializer
 )
@@ -32,13 +34,13 @@ class BaykeUserRetrieveAPIView(RetrieveAPIView):
         return get_user_model().objects.filter(id=self.request.user.id)
     
 
-class BaykeUserUpdateEmailAPIView(CreateAPIView):
+class BaykeVerifyCodeCreateAPIView(CreateAPIView):
     """ 修改邮箱地址接口 """
     
     serializer_class = CreateEmailCodeSerializer
     
     def get_queryset(self):
-        pass
+        return BaykeVerifyCode.objects.all()
     
     
     

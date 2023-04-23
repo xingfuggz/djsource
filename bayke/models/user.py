@@ -70,7 +70,7 @@ class BaykeVerifyCode(base.BaseModelMixin):
         send_mail(
             subject="BaykeShop验证码, 请查收！", 
             message=f"您的验证码为：{self.code}, 请尽快验证，5分钟内有效！",
-            from_email="1158920674@qq.com",
+            from_email="2539909370@qq.com",
             recipient_list=[self.email],
             fail_silently=False,
             auth_user="2539909370@qq.com",
