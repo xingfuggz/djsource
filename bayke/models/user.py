@@ -62,18 +62,20 @@ class BaykeVerifyCode(base.BaseModelMixin):
         return f"{self.email}-{self.code}"
     
     def save(self, *args, **kwargs) -> None:
-        from django.core.mail import send_mail
         from bayke.utils import code_random
         if not self.code:
             self.code = code_random()
         super().save(*args, **kwargs)
+        self.save_send_main(self.code)
+    
+    def save_send_main(self, code):
+        from django.core.mail import send_mail
         send_mail(
             subject="BaykeShop验证码, 请查收！", 
-            message=f"您的验证码为：{self.code}, 请尽快验证，5分钟内有效！",
+            message=f"您的验证码为：{code}, 请尽快验证，5分钟内有效！",
             from_email="2539909370@qq.com",
             recipient_list=[self.email],
             fail_silently=False,
             auth_user="2539909370@qq.com",
             auth_password="fhrygoqlndmxebjf"
         )
-    

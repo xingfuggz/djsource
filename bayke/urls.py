@@ -12,11 +12,21 @@
 
 from django.urls import path
 from bayke.views.rest_framework import generics
-
+from bayke.views.rest_framework import token
 
 app_name = "bayke"
 
 urlpatterns = [
+    # 当前登录用户详情
     path('user/<int:pk>/', generics.BaykeUserRetrieveAPIView.as_view(), name='user-detail'),
-    path('user/created/code/', generics.BaykeVerifyCodeCreateAPIView.as_view(), name='user-created-code'),
+    # 获取邮箱验证码
+    path('obtain/code/', generics.BaykeVerifyCodeObtainAPIView.as_view(), name='obtain-code'),
+    # 效验邮箱验证码
+    path('check/code/', generics.BaykeVerifyCodeCheckAPIView.as_view(), name='check-code'),
+    # 获取token
+    path("token/", token.TokenObtainPairView.as_view(), name="token"),
+    # 刷新token 
+    path("refresh/", token.TokenRefreshView.as_view(), name="refresh"),
+    # 验证token     
+    path("verify/", token.TokenVerifyView.as_view(), name="verify"),
 ]
