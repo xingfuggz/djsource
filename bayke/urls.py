@@ -29,4 +29,6 @@ urlpatterns = [
     path("refresh/", token.TokenRefreshView.as_view(), name="refresh"),
     # 验证token     
     path("verify/", token.TokenVerifyView.as_view(), name="verify"),
+    # 注册接口
+    path("register/", generics.BaykeUserRegisterAPIView.as_view(), name="register"),
 ]

@@ -88,7 +88,7 @@ class CheckEmailCodeSerializer(serializers.Serializer):
     def validate(self, attrs):
         email_codes = BaykeVerifyCode.objects.filter(email=attrs['email'], code=attrs['code'])
         if not email_codes.exists():
-            raise serializers.ValidationError("该验证码无效！")
+            raise serializers.ValidationError("该验证码不存在！")
         else:
             code = email_codes.first()
             from django.utils import timezone
@@ -96,5 +96,33 @@ class CheckEmailCodeSerializer(serializers.Serializer):
             # 判断是否过期，刷新验证码
             if nd > code.pub_date:
                 raise serializers.ValidationError("该验证码已过期，请重新获取！")
+        return attrs
+    
+    
+class RegisterSerializer(CheckEmailCodeSerializer):
+    
+    """ 用户注册 """
+    
+    username = serializers.CharField(label="用户名", max_length=32, min_length=2, validators=[
+        UniqueValidator(queryset=get_user_model().objects.all(), message="该用户名已存在，请更换！")
+    ])
+    password = serializers.CharField(label="密码", max_length=36, min_length=8, write_only=True)
+    email = serializers.EmailField(label="邮箱", max_length=100, validators=[
+        UniqueValidator(queryset=get_user_model().objects.all(), message="该邮箱已存在，请更换！")
+    ])
+    code = serializers.CharField(
+        label="验证码", 
+        max_length=bayke_settings.CODE_LENGTH, 
+        min_length=bayke_settings.CODE_LENGTH,
+        write_only=True
+    )
+    
+    def create(self, validated_data):
+        return get_user_model().objects.create_user(**validated_data)
+    
+    def validate(self, attrs):
+        # 如果不需要邮箱验证只需要注释掉下边这句
+        super().validate(attrs)  # 邮箱验证 
+        del attrs["code"]
         return attrs
     

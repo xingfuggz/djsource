@@ -20,7 +20,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from bayke.models.user import BaykeVerifyCode
 from bayke.views.rest_framework.serializers import (
-    UserSerializer, ObtainEmailCodeSerializer, CheckEmailCodeSerializer
+    UserSerializer, ObtainEmailCodeSerializer, CheckEmailCodeSerializer, 
+    RegisterSerializer
 )
 from bayke.views.rest_framework.mixins import CheckVerifyCodeMixin, RegisterUserMixin
 
@@ -56,7 +57,12 @@ class BaykeVerifyCodeCheckAPIView(CheckVerifyCodeMixin, GenericAPIView):
 
 class BaykeUserRegisterAPIView(RegisterUserMixin, GenericAPIView):
     
-    """ 用户注册视图 """
+    """ 用户注册接口 
+    这个用到了邮箱验证码验证
+    """
+    
+    serializer_class = RegisterSerializer
+    queryset = get_user_model().objects.all()
     
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)

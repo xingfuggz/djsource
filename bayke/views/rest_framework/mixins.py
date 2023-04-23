@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 from rest_framework.response import Response
@@ -30,9 +30,10 @@ class CheckVerifyCodeMixin:
         
 
 class RegisterUserMixin(mixins.CreateModelMixin):
+    """ 用户注册接口 """
     
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
-    
+        
     def perform_create(self, serializer):
         return super().perform_create(serializer)
