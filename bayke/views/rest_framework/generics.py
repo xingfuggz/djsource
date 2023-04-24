@@ -158,6 +158,9 @@ class BaykeOrderCreateAPIView(BaykeOrderCreateMixin, BaykeOrderViewMixin):
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
     
+    def perform_create(self, serializer):
+        return super().perform_create(serializer)
+    
     
 class BaykeOrderSKUCreateAPIView(mixins.CreateModelMixin, BaykeOrderViewMixin):
     """ 创建订单关联商品 
