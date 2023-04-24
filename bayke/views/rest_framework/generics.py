@@ -137,3 +137,48 @@ class BaykeCartUpdateCountAPIView(BaykeCartViewMixin, RetrieveUpdateAPIView):
     
 # end 购物车相关接口
 ###################################################################################################
+###################################################################################################
+# order 订单相关接口
+
+class BaykeOrderViewMixin(GenericAPIView):
+    """ 订单视图公共类 """
+    from bayke.views.rest_framework.serializers import BaykeOrderSerializer
+    from bayke.models.order import BaykeOrder
+    serializer_class = BaykeOrderSerializer
+    authentication_classes = [SessionAuthentication, JWTAuthentication]
+    permission_classes = [IsOwnerAuthenticated]
+    queryset = BaykeOrder.objects.all()
+
+from bayke.views.rest_framework.mixins import BaykeOrderCreateMixin
+class BaykeOrderCreateAPIView(BaykeOrderCreateMixin, BaykeOrderViewMixin):
+    """ 创建订单 """
+    
+    def post(self, request, *args, **kwargs):
+        # print(request.data)
+        return self.create(request, *args, **kwargs)
+    
+    
+    
+class BaykeOrderSKUCreateAPIView(mixins.CreateModelMixin, BaykeOrderViewMixin):
+    """ 创建订单关联商品 """
+    
+    from bayke.views.rest_framework.serializers import BaykeOrderSKUSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = BaykeOrderSKUSerializer
+    
+    def get_queryset(self):
+        from bayke.models.order import BaykeOrderSKU
+        return BaykeOrderSKU.objects.filter(order__owner=self.request.user)
+    
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+
+    
+    
+
+
+
+
+# end 订单相关接口
+###################################################################################################

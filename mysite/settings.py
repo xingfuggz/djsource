@@ -150,3 +150,8 @@ EMAIL_USE_SSL = True                      # 是否使用隐式的安全连接
 
 # 控制台后端
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+from datetime import timedelta
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}

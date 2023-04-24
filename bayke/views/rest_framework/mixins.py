@@ -45,3 +45,13 @@ class BaykeCartPushMixin(mixins.CreateModelMixin):
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
     
+    
+class BaykeOrderCreateMixin(mixins.CreateModelMixin):
+    """ 创建订单 """
+    
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+        
+    def perform_create(self, serializer):
+        serializer.save(commit=False)
+        print('asdas')

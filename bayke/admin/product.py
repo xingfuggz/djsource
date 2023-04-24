@@ -133,3 +133,9 @@ class BaykeProductSpecAdmin(BaseModelAdmin):
     list_display = ('id', 'name', 'operate')
     search_fields = ('name',)
     inlines = (BaykeProductSpecOptionInline, )
+    
+
+from bayke.models.order import BaykeOrder, BaykeOrderSKU
+
+admin.site.register(BaykeOrder)
+admin.site.register(BaykeOrderSKU)

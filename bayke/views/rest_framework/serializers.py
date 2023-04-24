@@ -204,15 +204,23 @@ class BaykeProductSPUSerializer(serializers.ModelSerializer):
         return specs_items
 
 
+###################################################################
+# cart start 购物车序列化
+
+class BaykeCartSPUSerializer(BaykeProductSPUSerializer):
+    pass
+class BaykeCartSKUSerializer(BaykeProductSKUSerializer):
+    spu = BaykeCartSPUSerializer(many=False, read_only=True)
 class BaykeCartSerializer(serializers.ModelSerializer):
     """ 购物车序列化类 """
-    
     owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    sku = BaykeCartSKUSerializer(many=False, read_only=True)
     
     class Meta:
         from bayke.models.cart import BaykeCart
         model = BaykeCart
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ("site", "is_del")
     
     def create(self, validated_data):
         from django.db.utils import IntegrityError
@@ -229,10 +237,82 @@ class BaykeCartSerializer(serializers.ModelSerializer):
             carts.update(count=F("count")+validated_data["count"])
             return carts.first()
     
-
-class BaykeCartUpdateCountSerializer(serializers.ModelSerializer):
     
+class BaykeCartUpdateCountSerializer(serializers.ModelSerializer):
+    """ 购物车数量修改序列化 """ 
     class Meta:
         from bayke.models.cart import BaykeCart
         model = BaykeCart
         fields = ("id", "count")
+
+# cart end 购物车序列化
+###################################################################
+###################################################################
+# order start 订单序列化
+
+class BaykeOrderSKUSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        from bayke.models.order import BaykeOrderSKU
+        model = BaykeOrderSKU
+        fields = "__all__"
+        
+
+class BaykeOrderSerializer(serializers.ModelSerializer):
+    
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    baykeordersku_set = BaykeOrderSKUSerializer(many=True, read_only=True)
+    
+    class Meta:
+        from bayke.models.order import BaykeOrder
+        model = BaykeOrder
+        fields = "__all__"
+
+    def create(self, validated_data):
+        print(validated_data)
+        """
+        {
+            "baykeordersku_set": [
+                {   
+                    "sku": 2,
+                    "count": 2
+                }
+            ],
+            "total_amount": 15,
+            "order_mark": "",
+            "name": "张真",
+            "phone": "18391037602",
+            "email": "asda@qq.com",
+            "address": "陕西咸阳"
+        }
+        """
+        baykeordersku_set = self.context['request'].data.pop("baykeordersku_set")
+        order = super().create(validated_data)
+        self.create_order_sku(baykeordersku_set, order)
+        return order
+
+    
+    def create_order_sku(self, skus:list, order):
+        from bayke.models.product import BaykeProductSKU
+        from bayke.models.order import BaykeOrderSKU
+        for sku in skus:
+            sku['order'] = order
+            try:
+                sku_obj = BaykeProductSKU.objects.get(id=int(sku.get('sku')))
+                sku["title"] = sku_obj.spu.title
+                sku["price"] = sku_obj.price
+                sku["content"] = sku_obj.spu.content
+                sku["options"] = list(sku_obj.options.values("spec__name", "name"))
+                sku.pop('sku')
+                BaykeOrderSKU.objects.create(sku=sku_obj, **sku)
+            except BaykeProductSKU.DoesNotExist:
+                pass
+    
+    # def validate(self, attrs):
+    #     baykeordersku_set = self.context['request'].data["baykeordersku_set"]
+    #     attrs["ba"]
+    #     print(attrs)
+    #     return super().validate(attrs)
+    
+# order end 订单序列化
+###################################################################

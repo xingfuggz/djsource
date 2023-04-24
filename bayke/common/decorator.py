@@ -33,6 +33,10 @@ class ConcreteComponent(Component):
     
     def operation(self) -> Decimal:
         return self.get_amount()
+    
+    @property
+    def order(self):
+        return self._order
 
 
 class Decorator(Component):

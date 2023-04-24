@@ -115,7 +115,7 @@ class BaykeProductSKU(base.ProductMixin):
 
     def __str__(self):
         """Unicode representation of BaykeProductSKU."""
-        return self.spu.title + str(self.id)
+        return self.spu.title
 
 
 class BaykeProductBanner(base.ImageMixin):
