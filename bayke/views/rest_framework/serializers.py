@@ -250,36 +250,57 @@ class BaykeCartUpdateCountSerializer(serializers.ModelSerializer):
 ###################################################################
 # order start 订单序列化
 
+class BaykeOrderSerializer(serializers.ModelSerializer):
+    """ 订单序列化基类 """
+
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        from bayke.models.order import BaykeOrder
+        model = BaykeOrder
+        exclude = ("site", "is_del")
+        
+
 class BaykeOrderSKUSerializer(serializers.ModelSerializer):
+    """ 这个接口轻易不用， 后期可能会调整，慎用
+    """
+    order = BaykeOrderSerializer(many=False)
+    is_commented = serializers.ReadOnlyField()
     
     class Meta:
         from bayke.models.order import BaykeOrderSKU
         model = BaykeOrderSKU
-        fields = "__all__"
+        exclude = ("site", "is_del")
+        
+    def create(self, validated_data):
+        # 该create方法慎用
+        order = validated_data.pop("order")
+        from bayke.models.order import BaykeOrder
+        order = BaykeOrder.objects.create(**order)
+        validated_data['options'] = list(validated_data['sku'].options.values("spec__name", "name"))
+        validated_data['title'] = validated_data['sku'].spu.title
+        validated_data['content'] = validated_data['sku'].spu.content
+        validated_data['price'] = validated_data['sku'].price
+        validated_data['order'] = order
+        return super().create(validated_data)
         
 
-class BaykeOrderSerializer(serializers.ModelSerializer):
+class BaykeOrderCreateSerializer(BaykeOrderSerializer):
+    """ 创建订单序列化 """
     
-    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
     baykeordersku_set = BaykeOrderSKUSerializer(many=True, read_only=True)
-    
-    class Meta:
-        from bayke.models.order import BaykeOrder
-        model = BaykeOrder
-        fields = "__all__"
 
     def create(self, validated_data):
-        print(validated_data)
-        """
+        """前端需要传递的数据结构
         {
             "baykeordersku_set": [
                 {   
-                    "sku": 2,
-                    "count": 2
+                    "sku": 2,   # 商品规格sku id => BaykeProductSKU
+                    "count": 2  # 购买数量
                 }
             ],
-            "total_amount": 15,
-            "order_mark": "",
+            "total_amount": 15, # 任意数字，总价由后台负责计算【可选】
+            "order_mark": "",   # 订单备注
             "name": "张真",
             "phone": "18391037602",
             "email": "asda@qq.com",
@@ -291,8 +312,8 @@ class BaykeOrderSerializer(serializers.ModelSerializer):
         self.create_order_sku(baykeordersku_set, order)
         return order
 
-    
     def create_order_sku(self, skus:list, order):
+        """ 保存关联订单商品 """
         from bayke.models.product import BaykeProductSKU
         from bayke.models.order import BaykeOrderSKU
         for sku in skus:
@@ -306,13 +327,7 @@ class BaykeOrderSerializer(serializers.ModelSerializer):
                 sku.pop('sku')
                 BaykeOrderSKU.objects.create(sku=sku_obj, **sku)
             except BaykeProductSKU.DoesNotExist:
-                pass
-    
-    # def validate(self, attrs):
-    #     baykeordersku_set = self.context['request'].data["baykeordersku_set"]
-    #     attrs["ba"]
-    #     print(attrs)
-    #     return super().validate(attrs)
+                raise serializers.ValidationError("传递的sku参数有误")
     
 # order end 订单序列化
 ###################################################################

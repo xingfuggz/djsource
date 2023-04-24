@@ -14,9 +14,26 @@ from . import decorator
 
 class OrderPayMony(decorator.ConcreteComponent):
     
-    def get_amount(self):
-        return 15
+    """ 计算订单的基础价 """
     
-    def get_skus_sum_price(self):
-        self.order.baykeordersku_set.all()
-
+    def _get_order_skus(self):
+        # 订单关联商品
+        return self.order.baykeordersku_set.all()
+    
+    def _get_order_skus_sum_price(self):
+        # from django.db.models import Sum
+        # self._get_order_skus().aggregate(Sum("price")).get("price__sum", 0)
+        return sum([(sku.price * sku.count) for sku in self._get_order_skus()])
+    
+    def _get_order_freight(self):
+        freight = self._get_order_skus().values("sku__spu__freight")
+        return freight.first().get("sku__spu__freight", 0)
+    
+    def _get_amount(self):
+        return self._get_order_skus_sum_price()+self._get_order_freight()
+    
+    def get_amount(self):
+        return round(Decimal(self._get_amount()), 2)
+    
+    def operation(self) -> Decimal:
+        return super().operation()

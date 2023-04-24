@@ -14,6 +14,7 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 
 from bayke.models.user import BaykeUser
+from bayke.models.order import BaykeOrderSKU
 
 User = get_user_model()
 
@@ -21,3 +22,13 @@ User = get_user_model()
 def update_email(sender, instance, **kwargs):
     """ 监听修改邮箱 """
     BaykeUser.objects.filter(owner=instance).update(email=instance.email)
+
+
+@receiver(post_save, sender=BaykeOrderSKU)
+def sku_stock_sales_update(sender, instance, **kwargs):
+    """ 订单关联商品保存成功 减库存 加销量 """
+    from django.db.models import F
+    sku = instance.sku
+    sku.stock = F("stock") - instance.count
+    sku.sales = F("sales") + instance.count
+    sku.save()

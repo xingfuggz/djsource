@@ -132,6 +132,7 @@ class BaykeCartUpdateCountAPIView(BaykeCartViewMixin, RetrieveUpdateAPIView):
     from bayke.views.rest_framework.serializers import BaykeCartUpdateCountSerializer
     serializer_class = BaykeCartUpdateCountSerializer
 
+    # 如某些平台不支持put请求，可开启该方法，使其支持post方法
     # def post(self, request, *args, **kwargs):
     #     return self.update(request, *args, **kwargs)
     
@@ -142,25 +143,26 @@ class BaykeCartUpdateCountAPIView(BaykeCartViewMixin, RetrieveUpdateAPIView):
 
 class BaykeOrderViewMixin(GenericAPIView):
     """ 订单视图公共类 """
-    from bayke.views.rest_framework.serializers import BaykeOrderSerializer
+    from bayke.views.rest_framework.serializers import BaykeOrderCreateSerializer
     from bayke.models.order import BaykeOrder
-    serializer_class = BaykeOrderSerializer
+    serializer_class = BaykeOrderCreateSerializer
     authentication_classes = [SessionAuthentication, JWTAuthentication]
     permission_classes = [IsOwnerAuthenticated]
     queryset = BaykeOrder.objects.all()
+
 
 from bayke.views.rest_framework.mixins import BaykeOrderCreateMixin
 class BaykeOrderCreateAPIView(BaykeOrderCreateMixin, BaykeOrderViewMixin):
     """ 创建订单 """
     
     def post(self, request, *args, **kwargs):
-        # print(request.data)
         return self.create(request, *args, **kwargs)
     
     
-    
 class BaykeOrderSKUCreateAPIView(mixins.CreateModelMixin, BaykeOrderViewMixin):
-    """ 创建订单关联商品 """
+    """ 创建订单关联商品 
+    暂未明确该接口的实际用途，后期可能删除，慎用
+    """
     
     from bayke.views.rest_framework.serializers import BaykeOrderSKUSerializer
     permission_classes = [IsAuthenticated]
@@ -172,13 +174,6 @@ class BaykeOrderSKUCreateAPIView(mixins.CreateModelMixin, BaykeOrderViewMixin):
     
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
-    
-
-    
-    
-
-
-
 
 # end 订单相关接口
 ###################################################################################################

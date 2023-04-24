@@ -53,5 +53,5 @@ class BaykeOrderCreateMixin(mixins.CreateModelMixin):
         return super().create(request, *args, **kwargs)
         
     def perform_create(self, serializer):
-        serializer.save(commit=False)
-        print('asdas')
+        serializer.save()
+        
