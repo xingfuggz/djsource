@@ -31,29 +31,17 @@ class CheckVerifyCodeMixin:
 
 class RegisterUserMixin(mixins.CreateModelMixin):
     """ 用户注册接口 """
-    
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-        
-    def perform_create(self, serializer):
-        return super().perform_create(serializer)
+    pass
     
 
 class BaykeProductSPURetrieveMixin(mixins.RetrieveModelMixin):
-    
+    """ 商品详情页接口 """
     pass
     
-    # def retrieve(self, request, *args, **kwargs):
-    #     response = super().retrieve(request, *args, **kwargs)
-    #     response.data["banners"] = self.get_banners()
-    #     return response
     
-    # def get_banners(self):
-    #     from bayke.views.rest_framework.serializers import BaykeProductBannerSerializer
-    #     serializer = BaykeProductBannerSerializer(self.get_banner_queryset(), many=True)
-    #     return serializer.data
+class BaykeCartPushMixin(mixins.CreateModelMixin):
+    """ 添加购物车 """
     
-    # def get_banner_queryset(self):
-    #     return self.get_object().baykeproductbanner_set.all()
-    
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
     

@@ -8,7 +8,7 @@
 @版本    :1.0
 @微信    :baywanyun
 '''
-
+   
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -136,12 +136,103 @@ class BaykeProductBannerSerializer(serializers.ModelSerializer):
         fields = ("id", "img")
 
 
+class BaykeProductSpecOptionSerializer(serializers.ModelSerializer):
+    """ 商品spec option """
+    
+    # spec = serializers.StringRelatedField()
+    
+    class Meta:
+        from bayke.models.product import BaykeProductSpecOption
+        model = BaykeProductSpecOption
+        fields = ('id', 'name', 'spec')
+
+
+class BaykeProductSPecSerializer(serializers.ModelSerializer):
+    """ 商品spec """
+    
+    class Meta:
+        from bayke.models.product import BaykeProductSpec
+        model = BaykeProductSpec
+        fields = "__all__"
+
+
+class BaykeProductSKUSerializer(serializers.ModelSerializer):
+    """ 商品sku """
+    
+    options = BaykeProductSpecOptionSerializer(many=True)
+    
+    class Meta:
+        from bayke.models.product import BaykeProductSKU
+        model = BaykeProductSKU
+        fields = "__all__"
+
+
+class BaykeProductCategorySerializer(serializers.ModelSerializer):
+    """ 商品分类 """
+    
+    # parent = serializers.StringRelatedField()
+    
+    class Meta:
+        from bayke.models.product import BaykeProductCategory
+        model = BaykeProductCategory
+        exclude = ("site", "desc", "keywords", "is_del")
+    
+
 class BaykeProductSPUSerializer(serializers.ModelSerializer):
     """ 商品序列化 """
     
-    baykeproductbanner_set = BaykeProductBannerSerializer(many=True)
+    cates = BaykeProductCategorySerializer(many=True, read_only=True)
+    baykeproductbanner_set = BaykeProductBannerSerializer(many=True, read_only=True)
+    baykeproductsku_set = BaykeProductSKUSerializer(many=True, read_only=True)
+    specs = serializers.SerializerMethodField()
     
     class Meta:
         from bayke.models.product import BaykeProductSPU
         model = BaykeProductSPU
         fields = "__all__"
+        
+    def get_specs(self, obj):
+        """ 整理specs规格列表 """
+        specs = obj.baykeproductsku_set.values("options__spec__name", "options__name")
+        specs_items = {}
+        for spec in specs:
+            if spec["options__spec__name"] not in specs_items:
+                specs_items[spec["options__spec__name"]] = []
+            for k in specs_items.keys():
+                if k == spec["options__spec__name"]:
+                    specs_items[spec["options__spec__name"]].append(spec["options__name"])
+        return specs_items
+
+
+class BaykeCartSerializer(serializers.ModelSerializer):
+    """ 购物车序列化类 """
+    
+    owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    
+    class Meta:
+        from bayke.models.cart import BaykeCart
+        model = BaykeCart
+        fields = "__all__"
+    
+    def create(self, validated_data):
+        from django.db.utils import IntegrityError
+        try:
+            instance = super().create(validated_data)
+            return instance   
+        except IntegrityError:
+            from django.db.models import F
+            from bayke.models.cart import BaykeCart
+            carts = BaykeCart.objects.filter(
+                owner=self.context['request'].user, 
+                sku=validated_data['sku']
+            )
+            carts.update(count=F("count")+validated_data["count"])
+            return carts.first()
+    
+
+class BaykeCartUpdateCountSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        from bayke.models.cart import BaykeCart
+        model = BaykeCart
+        fields = ("id", "count")

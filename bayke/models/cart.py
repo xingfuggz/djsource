@@ -31,7 +31,7 @@ class BaykeCart(base.BaseModelMixin):
         ordering = ['-add_date']
         verbose_name = 'BaykeCart'
         verbose_name_plural = 'BaykeCarts'
-        vconstraints = [
+        constraints = [
             models.UniqueConstraint(fields=['owner', 'sku'], name='unique_owner_sku')
         ]
 

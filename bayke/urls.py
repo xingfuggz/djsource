@@ -35,5 +35,11 @@ urlpatterns = [
     # 商品列表接口 get
     path("product/list/", generics.BaykeProductSPUListAPIView.as_view(), name="product-list"), 
     # 商品详情接口 get
-    path("product/<int:pk>/", generics.BaykeProductSPURetrieveAPIView.as_view(), name="product-detail")
+    path("product/<int:pk>/", generics.BaykeProductSPURetrieveAPIView.as_view(), name="product-detail"),
+    
+    # 加入购物车接口 get=>list  post=>create
+    path("carts/", generics.BaykeCartAPIView.as_view(), name="carts"),
+    # 修改购物车数量 put patch
+    path("carts/<int:pk>/count/", generics.BaykeCartUpdateCountAPIView.as_view(), name="carts-update-count"),
+    
 ]

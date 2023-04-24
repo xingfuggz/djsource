@@ -10,14 +10,17 @@
 '''
 
 from django.contrib.auth import get_user_model
+from rest_framework import mixins
 from rest_framework.generics import (
     RetrieveAPIView, CreateAPIView, GenericAPIView,
-    ListAPIView
+    ListAPIView, RetrieveUpdateAPIView
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.filters import SearchFilter, OrderingFilter
+
+from bayke.permissions import IsOwnerAuthenticated
 
 
 class BaykeUserRetrieveAPIView(RetrieveAPIView):
@@ -75,7 +78,6 @@ class BaykeProductSPUListAPIView(ListAPIView):
     排序：        'baykeproductsku__price', 'baykeproductsku__sales', 'add_date'
     多分类筛选:    cates=33&cates=34
     """
-    
     from django_filters.rest_framework.backends import DjangoFilterBackend
     from bayke.models.product import BaykeProductSPU
     from bayke.views.rest_framework.serializers import BaykeProductSPUSerializer
@@ -93,14 +95,45 @@ class BaykeProductSPUListAPIView(ListAPIView):
 
 from bayke.views.rest_framework.mixins import BaykeProductSPURetrieveMixin
 class BaykeProductSPURetrieveAPIView(BaykeProductSPURetrieveMixin, GenericAPIView):
-    
+    """ 商品详情页接口 """
     from bayke.models.product import BaykeProductSPU
     from bayke.views.rest_framework.serializers import BaykeProductSPUSerializer
     serializer_class = BaykeProductSPUSerializer
     queryset = BaykeProductSPU.objects.all()
+
+
+###################################################################################################
+# start 购物车相关接口
+
+from bayke.views.rest_framework.mixins import BaykeCartPushMixin
+class BaykeCartViewMixin:
+    """ GenericAPIView 属性集合 """
+    from bayke.views.rest_framework.serializers import BaykeCartSerializer
+    from bayke.models.cart import BaykeCart
+    serializer_class = BaykeCartSerializer
+    permission_classes = [IsOwnerAuthenticated]
+    authentication_classes = [SessionAuthentication, JWTAuthentication]
+    queryset = BaykeCart.objects.all()
+
+
+class BaykeCartAPIView(mixins.ListModelMixin, BaykeCartPushMixin, BaykeCartViewMixin, GenericAPIView):
+    """ 查看和新增购物车 """
     
     def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
     
-    def get_serializer(self, *args, **kwargs):
-        return super().get_serializer(*args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+
+class BaykeCartUpdateCountAPIView(BaykeCartViewMixin, RetrieveUpdateAPIView):
+
+    """ 修改购物车商品数量 """
+    from bayke.views.rest_framework.serializers import BaykeCartUpdateCountSerializer
+    serializer_class = BaykeCartUpdateCountSerializer
+
+    # def post(self, request, *args, **kwargs):
+    #     return self.update(request, *args, **kwargs)
+    
+# end 购物车相关接口
+###################################################################################################
