@@ -154,7 +154,9 @@ class OrderMixin(BaseModelMixin):
     total_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
-        verbose_name="商品总金额"
+        verbose_name="商品总金额",
+        blank=True,
+        default=0
     )
     order_mark = models.CharField(
         blank=True,

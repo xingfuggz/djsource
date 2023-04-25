@@ -286,7 +286,9 @@ class BaykeOrderSKUSerializer(serializers.ModelSerializer):
         
 
 class BaykeOrderCreateSerializer(BaykeOrderSerializer):
-    """ 创建订单序列化 """
+    """ 创建订单的同时跟随创建SKU序列化 
+    这个接口可以考虑拆分为两个接口，具体实现拆分到order.py中
+    """
     
     baykeordersku_set = BaykeOrderSKUSerializer(many=True, read_only=True)
 
@@ -314,23 +316,23 @@ class BaykeOrderCreateSerializer(BaykeOrderSerializer):
         self.create_order_sku(baykeordersku_set, order)
         return order
 
-    # def create_order_sku(self, skus:list, order):
-    #     """ 保存关联订单商品 """
-    #     from bayke.models.product import BaykeProductSKU
-    #     from bayke.models.order import BaykeOrderSKU
+    def create_order_sku(self, baykeordersku_set:list, order):
+        """ 保存关联订单商品 """
+        from bayke.models.product import BaykeProductSKU
+        from bayke.models.order import BaykeOrderSKU
 
-    #     for sku in skus:
-    #         sku['order'] = order
-    #         try:
-    #             sku_obj = BaykeProductSKU.objects.get(id=int(sku.get('sku')))
-    #             sku["title"] = sku_obj.spu.title
-    #             sku["price"] = sku_obj.price
-    #             sku["content"] = sku_obj.spu.content
-    #             sku["options"] = list(sku_obj.options.values("spec__name", "name"))
-    #             sku.pop('sku')
-    #             BaykeOrderSKU.objects.create(sku=sku_obj, **sku)
-    #         except BaykeProductSKU.DoesNotExist:
-    #             raise serializers.ValidationError("传递的sku参数有误")
+        for sku in baykeordersku_set:
+            sku['order'] = order
+            try:
+                sku_obj = BaykeProductSKU.objects.get(id=int(sku.get('sku')))
+                sku["title"] = sku_obj.spu.title
+                sku["price"] = sku_obj.price
+                sku["content"] = sku_obj.spu.content
+                sku["options"] = list(sku_obj.options.values("spec__name", "name"))
+                sku.pop('sku')
+                BaykeOrderSKU.objects.create(sku=sku_obj, **sku)
+            except BaykeProductSKU.DoesNotExist:
+                raise serializers.ValidationError("传递的sku参数有误")
     
     def get_skus(self, baykeordersku_set):
         from bayke.models.product import BaykeProductSKU
@@ -338,26 +340,11 @@ class BaykeOrderCreateSerializer(BaykeOrderSerializer):
         sku_qs = BaykeProductSKU.objects.filter(id__in=sku_ids)
         return sku_qs
 
-    def create_order_sku(self, baykeordersku_set, order):
-        skus = self.get_skus(baykeordersku_set)
-        from bayke.models.order import BaykeOrderSKU
-        if not skus.exists():
-            raise serializers.ValidationError("未传入正确的sku值")
-        for sku, i in enumerate(skus):
-            BaykeOrderSKU.objects.create(
-                title=sku.spu.title,
-                price=sku.price,
-                content=sku.spu.content,
-                options=list(sku.options.values("spec__name", "name")),
-                count=int(skus[i].get('count', 1)),
-                order=order
-            )
-
     def get_amount(self, baykeordersku_set):
         from decimal import Decimal
         skus = self.get_skus(baykeordersku_set)
         amount = sum([sku.price * Decimal(baykeordersku_set[i]['count']) 
-                for sku, i in enumerate(skus)])
+                for i, sku in enumerate(skus)])
         return amount
 
 # order end 订单序列化

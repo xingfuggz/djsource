@@ -69,7 +69,7 @@ class CouponDeductPayMony(Decorator):
         return self.component.operation() - 10
 
 
-def client_code(component: Component) -> None:
+def client(component: Component) -> None:
     """
     from bayke.common import decorator
     from bayke.models.order import BaykeOrder

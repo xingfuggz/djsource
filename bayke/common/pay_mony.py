@@ -12,12 +12,6 @@ from decimal import Decimal
 from . import decorator
 
 
-class OrderPayAmount:
-
-    def __init__(self, ) -> None:
-        pass
-
-
 class OrderPayMony(decorator.ConcreteComponent):
     
     """ 计算订单的基础价 """
