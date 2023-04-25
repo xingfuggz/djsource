@@ -17,8 +17,8 @@ from rest_framework import mixins
 from bayke.permissions import IsOwnerAuthenticated
 from bayke.views.rest_framework.serializers import BaykeOrderCreateSerializer
 from bayke.models.order import BaykeOrder, BaykeOrderSKU
-from bayke.common.pay_mony import OrderPayMony
-from bayke.common.decorator import client
+from bayke.common.pay_mony import OrderPayMony, computed
+
 
 ############################# 序列化 ###############################
 
@@ -57,7 +57,6 @@ class BaykeCreateOrderSKUSerializer(BaykeCreateOrderSerializer):
     def update(self, instance, validated_data):
         ordersku_set = validated_data.pop("baykeordersku_set")
         # 创建商品快照
-        amount = 0
         for ordersku in ordersku_set:
             ordersku["title"] = ordersku["sku"].spu.title
             ordersku["options"] = list(ordersku["sku"].options.values("spec__name", "name"))
@@ -70,7 +69,7 @@ class BaykeCreateOrderSKUSerializer(BaykeCreateOrderSerializer):
                 BaykeOrderSKU.objects.create(**ordersku)
         # 粗略计算商品价位，未包含运费，运费需要单独运算
         paymony = OrderPayMony(instance)
-        validated_data["total_amount"] = client(paymony)
+        validated_data["total_amount"] = computed(paymony)
         return super().update(instance, validated_data)
 
 ############################# 视图 ###############################

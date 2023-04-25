@@ -9,15 +9,10 @@
 @微信    :baywanyun
 '''
 
-from rest_framework import mixins
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import serializers
-from rest_framework.settings import api_settings
-from rest_framework import status
 
 from bayke.permissions import IsOwnerAuthenticated
 from bayke.models.order import BaykeOrder
@@ -46,7 +41,7 @@ class BaykeOrderPaySerializer(BaykeOrderSerializer):
         
 
 class BaykePayOrderAPIView(RetrieveUpdateAPIView):
-    
+    """ 订单支付接口 """
     serializer_class = BaykeOrderPaySerializer
     authentication_classes = [SessionAuthentication, JWTAuthentication]
     permission_classes = [IsOwnerAuthenticated]

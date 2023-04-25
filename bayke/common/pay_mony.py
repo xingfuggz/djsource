@@ -12,28 +12,71 @@ from decimal import Decimal
 from . import decorator
 
 
-class OrderPayMony(decorator.ConcreteComponent):
+class OrderPayBase:
+    """ 基类 """
     
-    """ 计算订单的基础价 """
-    
+    def computed(self) -> str:
+        pass
+
+
+class OrderPayMony(OrderPayBase):
+    """ 订单商品的基础价位 """
+
+    def __init__(self, order) -> None:
+        self._order = order
+        
     def _get_order_skus(self):
         # 订单关联商品
         return self.order.baykeordersku_set.all()
-    
+
     def _get_order_skus_sum_price(self):
-        # from django.db.models import Sum
-        # self._get_order_skus().aggregate(Sum("price")).get("price__sum", 0)
+        """ 订单商品的单价*数量计算
+        """
         return sum([(sku.price * sku.count) for sku in self._get_order_skus()])
     
     def _get_order_freight(self):
+        """ 运费
+        """
         freight = self._get_order_skus().values("sku__spu__freight")
         return freight.first().get("sku__spu__freight", 0)
-    
+
     def _get_amount(self):
         return self._get_order_skus_sum_price()+self._get_order_freight()
     
-    def get_amount(self):
-        return round(Decimal(self._get_amount()), 2)
+    def computed(self) -> Decimal:
+        return self._get_amount()
     
-    def operation(self) -> Decimal:
-        return super().operation()
+
+class Decorator(OrderPayBase):
+    """ 装饰者 """
+    
+    _component: OrderPayBase = None
+
+    def __init__(self, component: OrderPayBase) -> None:
+        self._component = component
+
+    @property
+    def component(self) -> OrderPayBase:
+        return self._component
+    
+    def computed(self) -> Decimal:
+        return self._component.computed()
+
+
+class VIPPayMony(Decorator):
+    """ VIP价位运算 """
+    
+    def computed(self) -> Decimal:
+        pass
+    
+    
+class CouponDeductPayMony(Decorator):
+    """ 优惠券价位运算 """
+    
+    def computed(self) -> Decimal:
+        pass
+
+
+def computed(orderpay:OrderPayBase):
+    """ 返回最终结果的工厂函数 """
+    return orderpay.computed()
