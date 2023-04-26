@@ -4,8 +4,6 @@ from abc import ABC, abstractmethod
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-from rest_framework import serializers
-
 from bayke.payment import AliPay
 from bayke.conf import bayke_settings
 from bayke.models.order import BaykeOrder
