@@ -17,10 +17,12 @@ from rest_framework import serializers
 from bayke.permissions import IsOwnerAuthenticated
 from bayke.models.order import BaykeOrder
 from bayke.views.rest_framework.serializers import BaykeOrderSerializer
-        
+from bayke.payment.payMethod import AlipayConcreate, client
+
+
 
 class BaykeOrderPaySerializer(BaykeOrderSerializer):
-    
+    """ 订单支付序列化 """
     owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
     order_sn = serializers.ReadOnlyField()
     pay_method = serializers.ChoiceField(BaykeOrder.PayMethodChoices.choices)
@@ -37,7 +39,10 @@ class BaykeOrderPaySerializer(BaykeOrderSerializer):
         return super().validate(attrs)
 
     def get_pay_url(self, obj):
-        return "asdasda"
+        if obj.pay_method == 2:
+            return client(AlipayConcreate(obj))
+        else:
+            return "暂不支持该支付方式！"
         
 
 class BaykePayOrderAPIView(RetrieveUpdateAPIView):
@@ -50,3 +55,6 @@ class BaykePayOrderAPIView(RetrieveUpdateAPIView):
     
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
+    
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)

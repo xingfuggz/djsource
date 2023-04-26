@@ -16,11 +16,11 @@ DEFAULTS_CONF = {
     # 验证码长度
     "CODE_LENGTH": 4,
     
-    "ALIPAY_APPID": "2021000116697536",
+    "ALIPAY_APPID": "2021000122666025",
     "ALIPAY_NOTIFY_URL": "baykeshop:alipay_notify",
     "ALIPAY_RETURN_URL": "baykeshop:alipay_notify",
     "ALIPAY_PRIVATE_KEY":"bayke/payment/alipay/keys/app_private_key.pem",
-    "ALIPAY_PUBLIC_KEY": "bayke/payment/alipay/keys/app_public_key.pem",
+    "ALIPAY_PUBLIC_KEY": "bayke/payment/alipay/keys/alipay_public_key.pem",
     "ALIPAY_SIGN_TYPE": "RSA2",  # RSA 或者 RSA2
     "ALIPAY_DEBUG": settings.DEBUG,
 }

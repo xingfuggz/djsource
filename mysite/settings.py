@@ -155,3 +155,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+ALIPAY_APPID = "2021003184685618"
+ALIPAY_PRIVATE_KEY = "bayke/payment/alipay/keys/private.pem"
+ALIPAY_PUBLIC_KEY = "bayke/payment/alipay/keys/public.pem"

@@ -9,7 +9,6 @@
 @微信    :baywanyun
 '''
 from decimal import Decimal
-from . import decorator
 
 
 class OrderPayBase:
@@ -45,6 +44,10 @@ class OrderPayMony(OrderPayBase):
     
     def computed(self) -> Decimal:
         return self._get_amount()
+    
+    @property
+    def order(self):
+        return self._order
     
 
 class Decorator(OrderPayBase):

@@ -17,7 +17,7 @@ from rest_framework import mixins
 from bayke.permissions import IsOwnerAuthenticated
 from bayke.views.rest_framework.serializers import BaykeOrderCreateSerializer
 from bayke.models.order import BaykeOrder, BaykeOrderSKU
-from bayke.common.pay_mony import OrderPayMony, computed
+from bayke.payment.payMony import OrderPayMony, computed
 
 
 ############################# 序列化 ###############################
