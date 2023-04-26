@@ -43,9 +43,9 @@ urlpatterns = [
     path("carts/<int:pk>/count/", generics.BaykeCartUpdateCountAPIView.as_view(), name="carts-update-count"),
     
     # 创建订单
-    # path('order/create/', generics.BaykeOrderCreateAPIView.as_view(), name='order-create'),
+    path('order/create/', generics.BaykeOrderCreateAPIView.as_view(), name='order-create'),
     # 订单商品创建
-    # path('order/create/sku/', generics.BaykeOrderSKUCreateAPIView.as_view(), name='order-create-sku'),
+    path('order/create/sku/', generics.BaykeOrderSKUCreateAPIView.as_view(), name='order-create-sku'),
 ]
 
 from bayke.views.rest_framework.order import BaykeCreateOrderAPIView, BaykeCreateOrderSKUAPIView

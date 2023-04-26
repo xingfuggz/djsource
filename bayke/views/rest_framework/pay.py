@@ -17,7 +17,7 @@ from rest_framework import serializers
 from bayke.permissions import IsOwnerAuthenticated
 from bayke.models.order import BaykeOrder
 from bayke.views.rest_framework.serializers import BaykeOrderSerializer
-from bayke.payment.payMethod import AlipayConcreate, client
+from bayke.payment.payMethod import AlipayConcreate, BalanceConcreate, client
 
 
 
@@ -27,22 +27,20 @@ class BaykeOrderPaySerializer(BaykeOrderSerializer):
     order_sn = serializers.ReadOnlyField()
     pay_method = serializers.ChoiceField(BaykeOrder.PayMethodChoices.choices)
     total_amount = serializers.ReadOnlyField()
-    pay_url = serializers.SerializerMethodField()
     
     class Meta:
         model = BaykeOrder
-        fields = ("id", "owner", "order_sn", "total_amount", "pay_method", "pay_url")
-        
-    def validate(self, attrs):
-        if attrs["pay_method"] != 2:
-            raise serializers.ValidationError("暂不支持该支付方式...")
-        return super().validate(attrs)
-
-    def get_pay_url(self, obj):
-        if obj.pay_method == 2:
-            return client(AlipayConcreate(obj))
-        else:
-            return "暂不支持该支付方式！"
+        fields = ("id", "owner", "order_sn", "total_amount", "pay_method")
+    
+    def validate_pay_method(self, method):
+        if method != 2:
+            raise serializers.ValidationError("暂不支持该支付方式...")   
+        return method
+    
+    def update(self, instance, validated_data):
+        if not instance.baykeordersku_set.exists():
+            raise serializers.ValidationError("该订单未关联任何商品")
+        return super().update(instance, validated_data)
         
 
 class BaykePayOrderAPIView(RetrieveUpdateAPIView):
@@ -53,8 +51,7 @@ class BaykePayOrderAPIView(RetrieveUpdateAPIView):
     queryset = BaykeOrder.objects.all()
     lookup_field = "order_sn"
     
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-    
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        response.data['pay_url'] = "asdasd"
+        return response
