@@ -1,1 +1,1 @@
-from . import base, article, product, order, system, user, cart
+from . import base, article, product, order, system, user, cart, sites
