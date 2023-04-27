@@ -136,6 +136,8 @@ class BaykeProductSpecAdmin(BaseModelAdmin):
     
 
 from bayke.models.order import BaykeOrder, BaykeOrderSKU
+from bayke.models.user import BaykeUser
 
 admin.site.register(BaykeOrder)
 admin.site.register(BaykeOrderSKU)
+admin.site.register(BaykeUser)

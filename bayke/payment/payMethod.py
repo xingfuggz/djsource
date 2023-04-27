@@ -1,13 +1,18 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
+from django.db.models import F
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.urls import reverse
+
+from rest_framework.response import Response
+from rest_framework import serializers
 
 from bayke.payment import AliPay
 from bayke.conf import bayke_settings
 from bayke.models.order import BaykeOrder
-
+from bayke.models.user import BaykeUser
 
 
 User = get_user_model()
@@ -26,8 +31,7 @@ class Creator(ABC):
     
     def some_operation(self):
         product = self.factory_method()
-        # return product.operation()
-        return product.payment()
+        return product.operation()
 
 
 class AlipayConcreate(Creator):
@@ -44,13 +48,10 @@ class WXPayConcreate(Creator):
 
 
 class BalanceConcreate(Creator):
-    
-    def __init__(self, order: BaykeOrder, owner:User) -> None:
-        super().__init__(order)
-        self.owner = owner
+    """ 余额支付 """
     
     def factory_method(self):
-        return BalanceProduct(self._order, self.owner)
+        return BalanceProduct(self._order)
 
     
 class Product(ABC):
@@ -70,7 +71,7 @@ class Product(ABC):
 
 class AliPayProduct(Product):
     """ 支付宝支付的具体实现 """
-    
+     
     # 私钥
     private_key_string = ""
     with open(settings.BASE_DIR / bayke_settings.ALIPAY_PRIVATE_KEY, 'r') as f:
@@ -103,7 +104,8 @@ class AliPayProduct(Product):
                 "subject": self.order.order_sn,
                 "product_code": "FAST_INSTANT_TRADE_PAY",
             },
-            return_url="http://127.0.0.1:3000",
+            return_url=f"{bayke_settings.SITE_URL}{reverse(bayke_settings.ALIPAY_RETURN_URL)}",
+            notify_url=f"{bayke_settings.SITE_URL}{reverse(bayke_settings.ALIPAY_RETURN_URL)}"
         )
         return url_params
     
@@ -113,6 +115,7 @@ class AliPayProduct(Product):
             url = "https://openapi-sandbox.dl.alipaydev.com/gateway.do?{data}".format(data=self.biz_content())
         else:
             url = "https://openapi.alipay.com/gateway.do?{data}".format(data=self.biz_content())
+        print(url)
         return url
     
 
@@ -131,7 +134,19 @@ class BalanceProduct(Product):
         self.owner = order.owner
     
     def operation(self) -> str:
-        return "余额支付"
+        try:
+            baykeuser = self.owner.baykeuser
+            if baykeuser.balance < self.order.total_amount:
+                raise serializers.ValidationError("当前用户余额不足，请充值！")
+            baykeuser.balance = F("balance") - self.order.total_amount
+            baykeuser.owner = self.owner
+            baykeuser.save()
+            # 修改订单状态
+            self.order.pay_status = 2
+            self.order.save()
+        except BaykeUser.DoesNotExist:
+            raise serializers.ValidationError("当前用户余额不足，请充值！")
+        return Response({'code':1, 'message': '余额支付成功！'})
 
 
 def client(creator:Creator):

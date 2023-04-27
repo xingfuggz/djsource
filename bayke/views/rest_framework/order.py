@@ -15,7 +15,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import mixins
 
 from bayke.permissions import IsOwnerAuthenticated
-from bayke.views.rest_framework.serializers import BaykeOrderCreateSerializer
+# from bayke.views.rest_framework.serializers import BaykeOrderCreateSerializer
 from bayke.models.order import BaykeOrder, BaykeOrderSKU
 from bayke.payment.payMony import OrderPayMony, computed
 
@@ -77,7 +77,7 @@ class BaykeCreateOrderSKUSerializer(BaykeCreateOrderSerializer):
 class BaykeOrderViewMixin(GenericAPIView):
     """ 订单视图公共类 """
     
-    serializer_class = BaykeOrderCreateSerializer
+    serializer_class = BaykeCreateOrderSerializer
     authentication_classes = [SessionAuthentication, JWTAuthentication]
     permission_classes = [IsOwnerAuthenticated]
     queryset = BaykeOrder.objects.all()

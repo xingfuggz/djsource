@@ -13,6 +13,8 @@
 from django.urls import path
 from bayke.views.rest_framework import generics
 from bayke.views.rest_framework import token
+from bayke.views.rest_framework.order import BaykeCreateOrderAPIView, BaykeCreateOrderSKUAPIView
+from bayke.views.rest_framework.pay import BaykePayOrderAPIView, AliPayNotifyAPIView
 
 app_name = "bayke"
 
@@ -43,21 +45,13 @@ urlpatterns = [
     path("carts/<int:pk>/count/", generics.BaykeCartUpdateCountAPIView.as_view(), name="carts-update-count"),
     
     # 创建订单
-    path('order/create/', generics.BaykeOrderCreateAPIView.as_view(), name='order-create'),
-    # 订单商品创建
-    path('order/create/sku/', generics.BaykeOrderSKUCreateAPIView.as_view(), name='order-create-sku'),
-]
-
-from bayke.views.rest_framework.order import BaykeCreateOrderAPIView, BaykeCreateOrderSKUAPIView
-from bayke.views.rest_framework.pay import BaykePayOrderAPIView
-order_urls = [
-    # 创建订单
     path('order/create/', BaykeCreateOrderAPIView.as_view(), name='order-create'),
     # 查看订单基础信息及创建关联商品，计算价格 get->detail put->order
     path('order/create/<str:order_sn>/', BaykeCreateOrderSKUAPIView.as_view(), name='order-create-sku'),
     
     # 支付
     path('pay/<str:order_sn>/', BaykePayOrderAPIView.as_view(), name='pay-order'),
+    
+    # 支付宝支付回调
+    path('alipay/success/', AliPayNotifyAPIView.as_view(), name="alipay-success")
 ]
-
-urlpatterns += order_urls

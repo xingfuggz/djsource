@@ -1,9 +1,10 @@
 import datetime
-from django.conf import settings
 
 
 DEFAULTS_CONF = {
     
+    # 站点URL，最后不带斜杠
+    "SITE_URL": "http://127.0.0.1:3000",
     # 手机号验证正则
     "REGEX_PHONE": "^1[358]\d{9}$|^147\d{8}$|^176\d{8}$",
     # 邮箱验证正则
@@ -16,11 +17,11 @@ DEFAULTS_CONF = {
     # 验证码长度
     "CODE_LENGTH": 4,
     
+    # 支付宝支付相关配置
     "ALIPAY_APPID": "2021000122666025",
-    "ALIPAY_NOTIFY_URL": "baykeshop:alipay_notify",
-    "ALIPAY_RETURN_URL": "baykeshop:alipay_notify",
+    "ALIPAY_NOTIFY_URL": "bayke:alipay-success",
+    "ALIPAY_RETURN_URL": "bayke:alipay-success",
     "ALIPAY_PRIVATE_KEY":"bayke/payment/alipay/keys/app_private_key.pem",
     "ALIPAY_PUBLIC_KEY": "bayke/payment/alipay/keys/alipay_public_key.pem",
     "ALIPAY_SIGN_TYPE": "RSA2",  # RSA 或者 RSA2
-    "ALIPAY_DEBUG": settings.DEBUG,
 }
