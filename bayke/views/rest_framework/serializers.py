@@ -15,6 +15,7 @@ from rest_framework.validators import UniqueValidator
 
 from bayke.conf import bayke_settings
 from bayke.models.user import BaykeUser, BaykeVerifyCode
+from bayke.models.sites import BaykeBanner
 
 
 class BaykeUserSerializer(serializers.ModelSerializer):
@@ -247,3 +248,10 @@ class BaykeCartUpdateCountSerializer(serializers.ModelSerializer):
 
 # cart end 购物车序列化
 ###################################################################
+
+
+class BaykeBannerSerializer(serializers.ModelSerializer):
+    """ 轮播图序列化 """
+    class Meta:
+        model = BaykeBanner
+        fields = "__all__"

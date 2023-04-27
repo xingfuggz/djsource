@@ -24,6 +24,7 @@ class BaykeProductCategory(base.CategoryMixin):
         null=True, 
         verbose_name=_("父级")
     )
+    pic = models.ImageField(_("推荐图"), upload_to="product/cate/", max_length=200, blank=True, default="default/cate.png")
     is_nav = models.BooleanField(_("菜单推荐"), default=True)
     
     # TODO: Define fields here
@@ -37,6 +38,13 @@ class BaykeProductCategory(base.CategoryMixin):
     def __str__(self):
         """Unicode representation of BaykeProductCategory."""
         return self.name
+    
+    @classmethod
+    def get_cates(cls):
+        cates = cls.objects.filter(is_nav=True, parent__isnull=True)
+        for cate in cates:
+            cate.sub_cates = cate.baykeproductcategory_set.filter(is_nav=True)
+        return cates
 
 
 class BaykeProductSpec(base.BaseModelMixin):

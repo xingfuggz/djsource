@@ -1,0 +1,32 @@
+<div id="carousel" class="container">
+    <template>
+        <b-carousel>
+            <b-carousel-item v-for="(carousel, i) in carousels" :key="i">
+                <section :class="`hero is-medium`">
+                    <a class="image" :href="carousel.target_url">
+                        <img width="100%" :src="`${carousel.img}`" :alt="carousel.desc"> 
+                    </a>
+                </section>
+            </b-carousel-item>
+        </b-carousel>
+    </template>
+</div>
+<script>
+    var carousel = new Vue({
+        el: '#carousel',
+        delimiters: ['{$', '$}'],
+        created() {
+            this.getBanners()
+        },
+        data: {
+            carousels: []
+        },
+        methods: {
+            getBanners(){
+                fetch("{% url 'bayke:banners' %}").then(res => res.json()).then(data => {
+                    this.carousels = data
+                })
+            }
+        },
+    })
+</script>

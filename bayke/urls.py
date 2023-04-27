@@ -17,5 +17,6 @@ app_name = "bayke"
 
 urlpatterns = [
     
+    path('', include('bayke.views.baykeshop.urls')),
     path('api/', include('bayke.views.rest_framework.urls')),
 ]

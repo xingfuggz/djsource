@@ -15,6 +15,13 @@ DEFAULTS_CONF = {
     
     "HAS_MESSAGE_EAMIL": False,
     
+    "HAS_SEARCH_CATEGORY": False,
+    
+    "PC_LOGO": "baykeshop",
+    
+    # 首页楼层数量及分类显示数量
+    "HOME_NAV_COUNT": 5,
+    
     # 手机号验证正则
     "REGEX_PHONE": "^1[358]\d{9}$|^147\d{8}$|^176\d{8}$",
     # 邮箱验证正则

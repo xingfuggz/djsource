@@ -31,6 +31,9 @@ urlpatterns = [
     # 注册接口 post
     path("register/", generics.BaykeUserRegisterAPIView.as_view(), name="register"),
     
+    # 轮播图 get => list
+    path('banners/', generics.BaykeBannerListAPIView.as_view(), name='banners'),
+    
     # 商品列表接口 get
     path("product/list/", generics.BaykeProductSPUListAPIView.as_view(), name="product-list"), 
     # 商品详情接口 get

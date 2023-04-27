@@ -138,3 +138,12 @@ class BaykeCartUpdateCountAPIView(BaykeCartViewMixin, RetrieveUpdateAPIView):
     
 # end 购物车相关接口
 ###################################################################################################
+
+
+class BaykeBannerListAPIView(ListAPIView):
+    """ 轮播图接口 """
+    from bayke.models.sites import BaykeBanner
+    from bayke.views.rest_framework.serializers import BaykeBannerSerializer
+    queryset = BaykeBanner.objects.all()
+    serializer_class = BaykeBannerSerializer
+    
