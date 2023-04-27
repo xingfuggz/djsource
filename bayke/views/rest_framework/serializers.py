@@ -127,6 +127,7 @@ class RegisterSerializer(CheckEmailCodeSerializer):
         return attrs
 
 
+###################### product Serializer ##########################
 class BaykeProductBannerSerializer(serializers.ModelSerializer):
     """ 商品序列化 """
     
@@ -219,7 +220,6 @@ class BaykeCartSerializer(serializers.ModelSerializer):
     class Meta:
         from bayke.models.cart import BaykeCart
         model = BaykeCart
-        # fields = "__all__"
         exclude = ("site", "is_del")
     
     def create(self, validated_data):

@@ -90,6 +90,7 @@ class AliPayProduct(Product):
             app_private_key_string=AliPayProduct.private_key_string,
             alipay_public_key_string=AliPayProduct.public_key_string,
             sign_type=bayke_settings.ALIPAY_SIGN_TYPE,
+            app_notify_url=f"{bayke_settings.SITE_URL}{reverse(bayke_settings.ALIPAY_RETURN_URL)}",
             debug=settings.DEBUG,
             verbose=settings.DEBUG,
         )
@@ -105,7 +106,6 @@ class AliPayProduct(Product):
                 "product_code": "FAST_INSTANT_TRADE_PAY",
             },
             return_url=f"{bayke_settings.SITE_URL}{reverse(bayke_settings.ALIPAY_RETURN_URL)}",
-            notify_url=f"{bayke_settings.SITE_URL}{reverse(bayke_settings.ALIPAY_RETURN_URL)}"
         )
         return url_params
     

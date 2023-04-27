@@ -24,6 +24,7 @@ class BaykeProductCategory(base.CategoryMixin):
         null=True, 
         verbose_name=_("父级")
     )
+    is_nav = models.BooleanField(_("菜单推荐"), default=True)
     
     # TODO: Define fields here
 
