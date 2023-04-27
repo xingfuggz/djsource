@@ -5,6 +5,16 @@ DEFAULTS_CONF = {
     
     # 站点URL，最后不带斜杠
     "SITE_URL": "http://127.0.0.1:3000",
+    
+    "SITE_HEADER": "Bayke",
+    "SITE_TITLE": "Bayke",
+    
+    "ADMIN_MENUS": True,
+    
+    "ADMIN_MENUS_DATAS": None,
+    
+    "HAS_MESSAGE_EAMIL": False,
+    
     # 手机号验证正则
     "REGEX_PHONE": "^1[358]\d{9}$|^147\d{8}$|^176\d{8}$",
     # 邮箱验证正则

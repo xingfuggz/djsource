@@ -90,3 +90,38 @@ class BaykePermission(PermMixin):
 
     def __str__(self):
         return f"{self.permission.name}"
+    
+
+class BaykeBanner(base.ImageMixin):
+    """Model definition for BaykeBanner."""
+    place = models.CharField(
+        _("位置标识"), 
+        max_length=50, 
+        blank=True, 
+        null=True, 
+        unique=True, 
+        help_text=_("留空则为首页banner，否则为指定位置banner")
+    )
+    target_url = models.CharField(_("跳转地址"), max_length=150, blank=True, default="")
+    sort = models.PositiveSmallIntegerField(_("排序"), default=1)
+    # TODO: Define fields here
+
+    class Meta(base.BaseModelMixin.Meta):
+        verbose_name = _("轮播图")
+        verbose_name_plural = verbose_name
+        ordering = ['sort']
+
+    def __str__(self):
+        return f"{self.place}【{self.img.url}】" if self.place else f"Home Banner{self.img.url}"
+
+
+class BaykeUpload(base.BaseModelMixin):
+    """ 富文本编辑器图片上传 """
+    img = models.ImageField(upload_to="upload/editor/", max_length=200)
+    
+    class Meta:
+        verbose_name = '富文本编辑器图片上传'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.img.name
